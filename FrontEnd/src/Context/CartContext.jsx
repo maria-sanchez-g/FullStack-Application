@@ -80,6 +80,23 @@ export function CartProvider({ children }) {
   const [state, dispatch] = useReducer(cartReducer, initialState);
   const cart = state.items;
 
+useEffect(() => { //runs after React finishes rendering. The empty array [] means “run this only once when the component mounts”.
+  const saved = localStorage.getItem("cart"); //It checks the browser’s localStorage for an entry named "cart". localStorage is a small storage area in the browser that keeps data even after the page reloads.
+  if (saved) {
+    try {
+      const parsed = JSON.parse(saved); //Converts the JSON string (for example: '[{"productId":1,"qty":2}]') back into a JavaScript array
+      if (Array.isArray(parsed)) { //Confirms that the parsed value is an array (your reducer expects an array of cart lines)
+        dispatch({ type: Types.INIT_SUCCESS, payload: parsed }); //“Initialize the cart with these items we found in localStorage.”That updates the context state so your app shows the saved cart.
+      }
+    } catch {}
+  }
+}, []);
+
+// Save to localStorage whenever the cart changes
+useEffect(() => {
+  localStorage.setItem("cart", JSON.stringify(state.items)); //This effect runs every time state.items changes — when you add, remove, or clear products. t converts the current cart (state.items) to a JSON string and saves it in the browser under the key "cart
+}, [state.items]); 
+
 async function addOne(productId) {
     await api.post(`/cart/${productId}`);
     dispatch({ type: Types.ADD_ONE, productId });

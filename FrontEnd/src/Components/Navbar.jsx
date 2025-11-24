@@ -18,7 +18,7 @@ export default function NavBar() {
   const navigate = useNavigate();
   const { totalQty, totalPrice } = useCart();
   const { items: products } = useProducts();
-  const grandTotal = totalPrice(products);
+  const grandTotal = products.length > 0 ? totalPrice(products) : 0;
 
   return (
     <Box sx={{ flexGrow: 1 }}>
